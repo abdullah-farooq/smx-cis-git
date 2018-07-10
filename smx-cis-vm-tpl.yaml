@@ -1,0 +1,46 @@
+creationTimestamp: '2018-07-09T19:44:59.924-07:00'
+description: ''
+id: '5273082835042411332'
+kind: compute#instanceTemplate
+name: smx-cis-tpl
+properties:
+  canIpForward: false
+  disks:
+  - autoDelete: true
+    boot: true
+    deviceName: smx-cis-tpl
+    index: 0
+    initializeParams:
+      diskSizeGb: '30'
+      diskType: pd-standard
+      sourceImage: projects/ubuntu-os-cloud/global/images/ubuntu-1710-artful-v20180612
+    kind: compute#attachedDisk
+    mode: READ_WRITE
+    type: PERSISTENT
+  machineType: g1-small
+  metadata:
+    fingerprint: 0L-2OZMl5Ec=
+    items:
+    - key: startup-script
+      value: |-
+        cd /home/ubuntu
+        git clone https://github.com/changli3/smx-cis-git.git
+        cd smx-cis-git
+        cat install.sh | sudo sh
+    kind: compute#metadata
+  networkInterfaces:
+  - accessConfigs:
+    - kind: compute#accessConfig
+      name: External NAT
+      type: ONE_TO_ONE_NAT
+    kind: compute#networkInterface
+    network: https://www.googleapis.com/compute/v1/projects/smx-gcloud-cis/global/networks/default
+  scheduling:
+    automaticRestart: true
+    onHostMaintenance: MIGRATE
+    preemptible: false
+  serviceAccounts:
+  - email: 147603613607-compute@developer.gserviceaccount.com
+    scopes:
+    - https://www.googleapis.com/auth/cloud-platform
+selfLink: https://www.googleapis.com/compute/v1/projects/smx-gcloud-cis/global/instanceTemplates/smx-cis-tpl
