@@ -8,6 +8,7 @@ sudo apt-get -y install wkhtmltopdf
 sudo apt-get -y install xvfb
 
 cat pk.txt >> .ssh/authorized_keys
+chmod +x gs*
 
 
 
