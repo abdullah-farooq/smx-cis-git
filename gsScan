@@ -1,0 +1,99 @@
+#!/bin/sh
+
+usage ()
+{
+  echo 'Usage : gsScan -p <project-id> -b <bucket-name> -r <report-to-path>'
+  exit
+}
+
+while [ "$1" != "" ]; do
+case $1 in
+        -p )           shift
+                       PROJECT=$1
+                       ;;
+        -b )           shift
+                       BUCKET=$1
+                       ;;
+        -r )           shift
+                       RPATH=$1
+                       ;; 
+        * )            ETC=$1
+    esac
+    shift
+done
+
+if [ "$PROJECT" = "" ]
+then
+    usage
+fi
+
+if [ "$BUCKET" = "" ]
+then
+    usage
+fi
+
+if [ "$RPATH" = "" ]
+then
+    RPATH=$(uuidgen)
+	mkdir $RPATH
+fi
+
+mkdir -p $RPATH/$PROJECT
+
+scan_bucket() {
+ DPATH=$RPATH/$PROJECT/$BUCKET
+ VPATH=$DPATH/violation
+ mkdir -p $DPATH
+ mkdir -p $VPATH
+ rm -f $VPATH/*
+ echo "processing $BUCKET"
+ iam=`gsutil iam get gs://$BUCKET | jq '.bindings[] | select(.members[]==("allUsers", "allAuthenticatedUsers"))'`
+ if [ "$iam" != "" ]
+ then
+   echo gs://$BUCKET > $VPATH/vl.0
+   echo $iam >> $VPATH/vl.0
+ fi
+
+ gsutil du gs://$BUCKET/** > $DPATH/bucket_sts
+ sts=$(echo $DPATH/bucket_sts)
+ if [ "$sts" = "" ]
+ then
+   return
+ fi
+
+ if [ "$iam" !=  "" ]
+ then
+   return
+ fi
+
+ i=1
+ gsutil -m ls -p $PROJECT -b -L gs://$BUCKET > $DPATH/bucket
+ gsutil -m ls -p $PROJECT gs://$BUCKET/** > $DPATH/allobjects
+ cat $DPATH/allobjects | while read gso
+ do
+   echo "processing $BUCKET - $gso"
+   iam=`gsutil -m iam get $gso | jq '.bindings[] | select(.members[]==("allUsers", "allAuthenticatedUsers"))'`
+   if [ "$iam" != "" ]
+   then
+     vp=$VPATH/vl.$i
+     i=$(expr $i + 1)
+     echo $gso > $vp
+     echo $iam >> $vp
+   fi
+ done
+}
+
+if [ "$BUCKET" = "*" ]
+then
+  gsutil -m ls -p $PROJECT gs:// | sed 's:/*$::' | sed 's:/gs\:\/\/::'  > $RPATH/$PROJECT/buckets
+  awk '{print substr($1,6,100)}' $RPATH/$PROJECT/buckets > $RPATH/$PROJECT/buckets_1
+  cat $RPATH/$PROJECT/buckets_1 | while read gsb
+  do
+    BUCKET=$gsb
+    scan_bucket
+  done 
+else
+  scan_bucket
+fi
+
+

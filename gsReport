@@ -1,0 +1,13 @@
+#python report.py $@
+dt=$(date '+%Y%m%d%H%M%S')
+html=$1/gsscan-report-$dt.html
+pdf=$1/gsscan-report-$dt.pdf
+cp report.html $html
+python report.py -s -r $1 -p $2 >> $html
+python report.py -r $1 -p $2 >> $html
+echo '</div></body></html>' >> $html
+xvfb-run wkhtmltopdf $html $pdf
+gsutil cp $html gs://$3/$2/
+gsutil cp $pdf gs://$3/$2/
+
+
