@@ -1,0 +1,15 @@
+2018-07-12 00:36:02,230 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub']
+2018-07-12 00:36:02,231 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub', u'subscriptions']
+2018-07-12 00:36:02,235 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub', u'subscriptions', u'pull']
+2018-07-12 00:36:02,240 DEBUG    root            Running [gcloud.pubsub.subscriptions.pull] with arguments: [--auto-ack: "True", --format: "json(message.attributes, message.messageId, message.publishTime)", --project: "smx-gcloud-cis", SUBSCRIPTION: "smx-command-subscription"]
+2018-07-12 00:36:04,694 INFO     root            Display format: "table[box](
+  message.data.decode(base64).decode(utf-8),
+  message.messageId,
+  message.attributes.list(separator='
+'),
+  ackId.if(NOT auto_ack)
+)
+ json(message.attributes, message.messageId, message.publishTime)"
+2018-07-12 00:36:04,694 INFO     ___FILE_ONLY___ []
+
+2018-07-12 00:36:04,696 DEBUG    root            SDK update checks are disabled.

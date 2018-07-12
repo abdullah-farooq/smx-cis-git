@@ -1,0 +1,7 @@
+HOME=/home/ubuntu/smx-cis-git
+MessHome=$HOME/messages
+
+for entry in `ls $MessHome/*.json`; do
+    mv $entry $entry.txt
+    python ./process_message.py $entry.txt
+done

@@ -1,1 +1,0 @@
-find ./*/*/*/violation/  -name "vl.*"

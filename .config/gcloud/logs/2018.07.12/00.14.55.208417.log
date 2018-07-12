@@ -1,0 +1,36 @@
+2018-07-12 00:14:55,209 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub']
+2018-07-12 00:14:55,210 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub', u'subscriptions']
+2018-07-12 00:14:55,213 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub', u'subscriptions', u'pull']
+2018-07-12 00:14:55,218 DEBUG    root            Running [gcloud.pubsub.subscriptions.pull] with arguments: [--auto-ack: "True", --format: "json(message.attributes, message.messageId, message.publishTime)", --project: "smx-gcloud-cis", SUBSCRIPTION: "smx-command-subscription"]
+2018-07-12 00:14:55,956 INFO     root            Display format: "table[box](
+  message.data.decode(base64).decode(utf-8),
+  message.messageId,
+  message.attributes.list(separator='
+'),
+  ackId.if(NOT auto_ack)
+)
+ json(message.attributes, message.messageId, message.publishTime)"
+2018-07-12 00:14:55,957 INFO     ___FILE_ONLY___ [
+  {
+2018-07-12 00:14:55,957 INFO     ___FILE_ONLY___ 
+    "message": {
+2018-07-12 00:14:55,957 INFO     ___FILE_ONLY___ 
+      "attributes": {
+2018-07-12 00:14:55,957 INFO     ___FILE_ONLY___ 
+        "Command": "RunScan",
+2018-07-12 00:14:55,957 INFO     ___FILE_ONLY___ 
+        "ScanType": "GCloudStorage"
+2018-07-12 00:14:55,957 INFO     ___FILE_ONLY___ 
+      },
+2018-07-12 00:14:55,957 INFO     ___FILE_ONLY___ 
+      "messageId": "126016993793275",
+2018-07-12 00:14:55,958 INFO     ___FILE_ONLY___ 
+      "publishTime": "2018-07-12T00:07:59.605Z"
+2018-07-12 00:14:55,958 INFO     ___FILE_ONLY___ 
+    }
+2018-07-12 00:14:55,958 INFO     ___FILE_ONLY___ 
+  }
+2018-07-12 00:14:55,958 INFO     ___FILE_ONLY___ 
+]
+
+2018-07-12 00:14:55,959 DEBUG    root            SDK update checks are disabled.
