@@ -20,8 +20,7 @@ resources:
         value: |-
           cd /home/ubuntu
           git clone https://github.com/changli3/smx-cis-git.git
-          cd smx-cis-git
-          cat install.sh | sudo sh
+          cat smx-cis-git/install.sh | sudo sh
       kind: compute#metadata
     serviceAccounts:
     - email: 147603613607-compute@developer.gserviceaccount.com
