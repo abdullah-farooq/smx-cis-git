@@ -1,4 +1,0 @@
-2018-07-12 00:18:02,552 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub']
-2018-07-12 00:18:02,554 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub', u'subscriptions']
-2018-07-12 00:18:02,559 DEBUG    root            Loaded Command Group: [u'gcloud', u'pubsub', u'subscriptions', u'pull']
-2018-07-12 00:18:02,563 ERROR    root            (gcloud.pubsub.subscriptions.pull) argument --project: expected one argument
