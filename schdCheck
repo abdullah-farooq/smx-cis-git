@@ -1,0 +1,44 @@
+#!/bin/sh
+root_project=smx-gcloud-cis
+command_topic=smx-command
+command_subscription=smx-command-subscription
+log_topic=log-aggregation
+root_report=smx-cis-reports
+root_bucket=smx-cis-root
+
+usage ()
+{
+  echo 'Usage : schdCheck -w <working-dir>'
+  exit
+}
+
+while [ "$1" != "" ]; do
+case $1 in
+        -w )           shift
+                       WDIR=$1
+                       ;;
+        * )            ETC=$1
+    esac
+    shift
+done
+
+if [ "$WDIR" = "" ]
+then
+    WDIR=$(uuidgen)
+    mkdir -p $WDIR
+fi
+
+if [ "$WDIR" = "" ]
+then
+    usage
+fi
+
+rm -rf $WDIR/*
+
+gsutil cp gs://$root_bucket/*.config $WDIR/
+gsutil ls gs://$root_bucket > $WDIR/config_all
+python schd_check.py -p $root_project -w $WDIR -r $root_bucket
+touch $WDIR/.schd_check
+gsutil cp $WDIR/.schd_check gs://$root_bucket/
+
+rm -rf $WDIR
