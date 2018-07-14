@@ -5,3 +5,5 @@ for entry in `ls $MessHome/*.json`; do
     mv $entry $entry.txt
     python ./process_message.py $entry.txt
 done
+
+./schdCheck
