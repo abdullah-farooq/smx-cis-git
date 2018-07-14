@@ -46,3 +46,4 @@ gcp: smx-gcloud-cis can create log metric and alarm for route and VPC peer chang
 
 Metric 3.14: Ensure a log metric filter and alarm exist for VPC changes.
 gcp: smx-gcloud-cis can create log metric and alarm for VPC changes.
+

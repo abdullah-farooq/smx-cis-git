@@ -1,0 +1,79 @@
+1. s3-bucket-audit-event-trigger
+- triggered by CloudWatch Rule.
+      "PutBucketAcl",
+      "DeleteBucketPolicy",
+      "PutBucketPolicy"
+
+- Queue message 
+    queueMessage = {
+        'eventName': event["detail"]["eventName"],
+        "bucketName": bucket,
+        "userOrRole": get_user(event["detail"]),
+        "time": event["time"]
+    }
+	
+- Trigger Config Rule to evaluate, the rule will call: smx-s3-bucket-audit	to validate. If any violation found,
+aws config will report as non-compliant
+
+2. smx-s3-bucket-audit
+- triggered by CloudWatch Rule. // filter with tag - os.environ.get('smx_tag_key', 'SMX:Protected') == 'Remediate' / 'Report'
+      "PutBucketTagging",
+      "DeleteBucketTagging"
+-- when opt-in
+--- copy the current bucket acl "configBucket/protected-templates/bucket/"
+--- copy the current bucket policy "configBucket/protected-templates/bucket/"
+--- baseline acl in "configBucket/baseline/bucket/"
+--- baseline policy in configBucket/"baseline/bucket/"
+--- baseline allowed roles (current lambda role) in "configBucket/protected-templates/bucket/"
+--- add to audit trail logging
+
+-- when opt-out
+--- delete acl "configBucket/protected-templates/bucket/"
+--- delete policy "configBucket/protected-templates/bucket/"
+--- delete baseline acl in "configBucket/baseline/bucket/"
+--- delete baseline policy in configBucket/"baseline/bucket/"
+--- delete baseline allowed roles (current lambda role) in "configBucket/protected-templates/bucket/"
+--- remove to audittrail logging
+
+
+- triggered by Config Rule.
+-- Get the message,
+-- Compare against the current copy
+-- Report violation / revert changes if set to Remediate, if violation
+-- Send notification, if compliant
+
+
+3. smx-s3-object-audit
+- Triggered by CloudWatch Rule
+      "PutObject",
+      "PutObjectAcl"
+-- loop through the ACL find AllUser, AllAuthUser, report them, and remove them if type set to be "Remedaite"
+
+
+
+
+
+SEND FEEDBACK
+Stackdriver   Documentation   Logging
+Quickstart
+This page shows you how to read and write log entries in Stackdriver Logging.
+
+Before you begin
+Select or create a GCP project.
+
+GO TO THE MANAGE RESOURCES PAGE
+
+Make sure that billing is enabled for your project.
+
+LEARN HOW TO ENABLE BILLING
+
+Install and initialize the Cloud SDK.
+Install the gcloud commands component:
+gcloud components install
+Write log entries using the Cloud SDK
+Use the following gcloud command to write a simple text log entry directly to Stackdriver Logging:
+
+gcloud logging write my-test-log "A simple entry"
+Use gcloud again to write a structured log entry to Stackdriver Logging:
+
+gcloud logging write --payload-type=json my-test-log '{ \"message\": \"My second entry\", \"weather\": \"partly cloudy\"}'
