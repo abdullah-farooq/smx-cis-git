@@ -10,7 +10,7 @@ root_bucket=smx-cis-root
 dtfile=$(date '+%Y%m%d%H%M%S')
 mkdir -p $HOME/locks
 
-message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription --format="json(message.attributes, message.messageId, message.publishTime)" 2>>$HOME/errors.log)
+message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription --format="json(message.attributes, message.messageId, message.publishTime)")
 
 if [ "$message" != "[]" ]
 then

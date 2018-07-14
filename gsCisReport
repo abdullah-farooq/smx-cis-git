@@ -1,0 +1,11 @@
+#python report.py $@
+dt=$(date '+%Y%m%d%H%M%S')
+html=$1/cisscan-report-$dt.html
+pdf=$1/cisscan-report-$dt.pdf
+cp report.html $html
+python cis_report.py -r $1 -p $2 >> $html
+xvfb-run wkhtmltopdf $html $pdf
+gsutil cp $html gs://$3/$2/
+gsutil cp $pdf gs://$3/$2/
+
+

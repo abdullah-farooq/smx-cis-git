@@ -5,6 +5,7 @@ from subprocess import call
 
 with open(sys.argv[1]) as json_data:
   mess = json.load(json_data)
+  json_data.close()
 
 os.remove(sys.argv[1])
 
@@ -15,7 +16,6 @@ for m in mess:
      continue
    if not m["message"]["attributes"].has_key("Command"):
      continue
-   print "hhhhh"
    c = m["message"]["attributes"]["Command"]
    if c == "RunScan":
      if not m["message"]["attributes"].has_key("ScanType"):
@@ -30,4 +30,10 @@ for m in mess:
           b='*'
        else:
           b = m["message"]["attributes"]["Bucket"]
-       os.system("/home/ubuntu/smx-cis-git/gsScan -p {} -b '{}'".format(p, b)) 
+       os.system("/home/ubuntu/smx-cis-git/gsScan -p {} -b '{}'".format(p, b))
+     if t == "GCloudCIS":
+        if not m["message"]["attributes"].has_key("Project"):
+            continue
+        else:
+            p =  m["message"]["attributes"]["Project"]
+        os.system("/home/ubuntu/smx-cis-git/gsCisScan -p {}".format(p))

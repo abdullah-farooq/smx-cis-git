@@ -1,0 +1,74 @@
+#!/bin/sh
+root_project=smx-gcloud-cis
+command_topic=smx-command
+command_subscription=smx-command-subscription
+log_topic=log-aggregation
+root_report=smx-cis-reports
+root_bucket=smx-cis-root
+
+usage ()
+{
+  echo 'Usage : gsScan -p <project-id> -r <report-to-path>'
+  exit
+}
+
+while [ "$1" != "" ]; do
+case $1 in
+        -p )           shift
+                       PROJECT=$1
+                       ;;
+        -r )           shift
+                       RPATH=$1
+                       ;; 
+        * )            ETC=$1
+    esac
+    shift
+done
+
+if [ "$PROJECT" = "" ]
+then
+    usage
+fi
+
+if [ "$RPATH" = "" ]
+then
+    RPATH=$(uuidgen)
+	mkdir $RPATH
+fi
+
+mkdir -p $RPATH/$PROJECT
+DPATH=$RPATH/$PROJECT
+
+scan_cis() {
+  gcloud projects get-iam-policy $PROJECT --format json > $DPATH/project-iam  
+  gcloud kms locations list |  while read loc
+  do
+   if [ "$loc" != "LOCATION_ID" ]
+   then
+     list_kms $loc
+   fi
+  done
+
+  gcloud compute firewall-rules list --format "json(name, network, sourceRanges, allowed)" --project $PROJECT >  $DPATH/project-firewall-rules
+  gcloud compute networks subnets list --project $PROJECT --format json > $DPATH/project-subnets  
+  gcloud compute networks list --project $PROJECT --format json > $DPATH/project-network
+
+}
+
+list_kms () {
+   gcloud kms keyrings list --location $1 --project $PROJECT 2>/dev/null | while read kr
+   do
+    if [ "$kr" != "NAME" ] 	
+    then	
+     kring=$(basename "$kr")
+	 gcloud kms keys list --keyring $kring --location $1 --project $PROJECT --format json | jq '.[] | {n:.name, r:.rotationPeriod} | .[]' >> $DPATH/project-kms
+    fi      
+   done
+}
+
+scan_cis
+
+./gsCisReport $RPATH $PROJECT $root_report
+rm -rf $RPATH
+
+
