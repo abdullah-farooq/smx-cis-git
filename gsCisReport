@@ -8,4 +8,6 @@ xvfb-run wkhtmltopdf $html $pdf
 gsutil cp $html gs://$3/$2/
 gsutil cp $pdf gs://$3/$2/
 
+python awssns.py -m "CIS scan report finished" -t "info"
+
 

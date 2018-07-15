@@ -5,7 +5,7 @@ import re
 import sys
 import os
 import jmespath
-
+import util
 
 from optparse import OptionParser
 parser = OptionParser()
@@ -85,6 +85,11 @@ def doNew(conf):
     confdir=CONFDIR.format(options.sysbuck, conf["project"], conf["bucket"])
     os.system("gsutil notification create -f json -t {} gs://{}".format(options.topic, conf["bucket"]))
     os.system("touch {}/.lastupdate && gsutil cp {}/.lastupdate {}".format(options.wpath, options.wpath, confdir))
+    util.send_aws_sns({
+        "message" : "Set up to tracking for bucket {} of project {}.".format(conf["bucket"],  conf["project"]),
+        "type":"info", 
+        "source" : "smx gcloud cis"}
+        })
 
 def doCheck(conf):
     confdir=CONFDIR.format(options.sysbuck, conf["project"], conf["bucket"])
@@ -115,6 +120,11 @@ def doDelete(confdir):
       for ln in notes:
           os.system("gsutil notification delete {}".format(ln))
     os.system("gsutil rm -r {}".format(confdir))
+    util.send_aws_sns({
+        "message" : "Removed tracking of bucket {} of project {}.".format(bucket, project),
+        "type":"info",
+        "source" : "smx gcloud cis"}
+        })
 
 
 #deal with new
