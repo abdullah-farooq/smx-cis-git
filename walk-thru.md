@@ -34,13 +34,13 @@ curl -o https://raw.githubusercontent.com/changli3/smx-cis-git/master/vm-config.
 gcloud deployment-manager deployments create smx-cis-vm --config vm-config.yaml
 ```
 
-## Need to set up public IP
+### Need to set up public IP
 ```
 gcloud compute addresses list
 gcloud compute instances add-access-config smx-cis-vm-147603613607 --zone us-east4-c --address=35.199.60.27 
 ```
 
-## Set up VM
+### Set up VM
 
 ```
 gcloud compute ssh smx-cis-vm-147603613607 --zone us-east4-c
@@ -50,7 +50,7 @@ cd smx-cis-git/
 cat install.sh | sh
 ```
 
-## SSH with putty
+### SSH with putty
 ```
 gcloud config list (find the role the computer is using, then all the projects need to 
 provide auth, this is in the vm.yaml)
@@ -60,19 +60,20 @@ cd smx-cis-git/
 ./gsPubsub
 ```
 
-## Set up Cron
+### Set up Cron
 ```
 crontab -e
 */3 * * * * /home/ubuntu/smx-cis-git/gsPubsub
 ```
 
-## Set up AWS SNS
+### Set up AWS SNS
 
 ```
 source ./gsEnvironment 
 gcloud kms keys list --location global --keyring smxcis --project $root_project
-#gcloud kms keyrings create smxcis --location global  --project $root_project 
-#gcloud kms keys create awsseckey --location global --keyring smxcis --purpose encryption --project $root_project
+
+# gcloud kms keyrings create smxcis --location global  --project $root_project 
+# gcloud kms keys create awsseckey --location global --keyring smxcis --purpose encryption --project $root_project
 
 gcloud kms decrypt \
       --key=awsseckey \
@@ -81,7 +82,7 @@ gcloud kms decrypt \
       --ciphertext-file=./aws-config \
       --plaintext-file=~/.aws/config	
 
-gcloud kms encrypt \
+# gcloud kms encrypt \
       --key awsseckey \
       --keyring smxcis \
       --location global \
