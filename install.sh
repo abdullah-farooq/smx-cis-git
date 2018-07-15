@@ -6,8 +6,8 @@ sudo apt-get update
 sudo apt-get -y install jq
 sudo apt-get -y install wkhtmltopdf
 sudo apt-get -y install xvfb
-
-cat pk.txt >> .ssh/authorized_keys
+sudo pip install jmespath
+cat pk.txt >> ~/.ssh/authorized_keys
 chmod +x gs*
 
 
