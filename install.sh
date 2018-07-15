@@ -7,6 +7,8 @@ sudo apt-get -y install jq
 sudo apt-get -y install wkhtmltopdf
 sudo apt-get -y install xvfb
 sudo pip install jmespath
+sudo pip install boto3
+
 cat pk.txt >> ~/.ssh/authorized_keys
 chmod +x gs*
 

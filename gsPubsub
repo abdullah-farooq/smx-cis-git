@@ -19,3 +19,4 @@ then
   /usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/gsProcessMessage  
 fi
 
+/usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/schdCheck
