@@ -89,7 +89,7 @@ def doNew(conf):
         "message" : "Set up to tracking for bucket {} of project {}.".format(conf["bucket"],  conf["project"]),
         "type":"info", 
         "source" : "smx gcloud cis"}
-        })
+        )
 
 def doCheck(conf):
     confdir=CONFDIR.format(options.sysbuck, conf["project"], conf["bucket"])
@@ -123,7 +123,7 @@ def doDelete(confdir):
     util.send_aws_sns({
         "message" : "Removed tracking of bucket {} of project {}.".format(bucket, project),
         "type":"info",
-        "source" : "smx gcloud cis"}
+        "source" : "smx gcloud cis"
         })
 
 
