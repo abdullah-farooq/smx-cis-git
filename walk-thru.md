@@ -117,7 +117,7 @@ gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Co
 # create cis benchmark scan report
 gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Command=RunScan,ScanType=GCloudCIS,Project=wired-ripsaw-209512
 ```
-Equivalentyl, you can use GPC Console -
+Equivalently, you can use GPC Console -
 ```
 Topic: smx-command
 Command: RunScan
