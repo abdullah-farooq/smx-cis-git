@@ -6,4 +6,3 @@ for entry in `ls $MessHome/*.json`; do
     python ./process_message.py $entry.txt
 done
 
-./schdCheck

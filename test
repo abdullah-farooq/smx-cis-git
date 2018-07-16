@@ -1,7 +1,0 @@
-awsconf="/home/ubuntu/.aws/config"
-lines = [line.rstrip('\n') for line in open(awsconf)]
-print lines
-print lines[0]
-key1=lines[1].split('=')[1]
-key2=lines[2].split('=')[1]
-print key1, key2

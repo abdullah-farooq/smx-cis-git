@@ -18,4 +18,4 @@ while true; do
   /usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/gsProcessMessage
 done
 
-/usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/schdCheck
+## /usr/bin/flock -n $HOME/locks/gsSchdCheck.lockfile $HOME/gsSchdCheck

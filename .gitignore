@@ -2,3 +2,4 @@
 /.gsutil
 /.selected_editor
 /.viminfo
+.bucket_config

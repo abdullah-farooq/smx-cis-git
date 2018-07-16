@@ -14,7 +14,7 @@ parser.add_option("-c", "--config", action="store", type="string", dest="confbuc
 parser.add_option("-s", "--system", action="store", type="string", dest="sysbuck")
 parser.add_option("-w", "--work", action="store", type="string", dest="wpath")
 parser.add_option("-p", "--project", action="store", type="string", dest="project")
-parser.add_option("-t", "--topic", action="store", type="string", dest="topic")
+# parser.add_option("-t", "--topic", action="store", type="string", dest="topic")
 
 
 (options, args) = parser.parse_args(sys.argv)
@@ -83,7 +83,7 @@ for line in dirlines:
 
 def doNew(conf):
     confdir=CONFDIR.format(options.sysbuck, conf["project"], conf["bucket"])
-    os.system("gsutil notification create -f json -t {} gs://{}".format(options.topic, conf["bucket"]))
+    #os.system("gsutil notification create -f json -t {} gs://{}".format(options.topic, conf["bucket"]))
     os.system("touch {}/.lastupdate && gsutil cp {}/.lastupdate {}".format(options.wpath, options.wpath, confdir))
     os.system("gsutil ls -b -L gs://{} > {}/acl.txt".format(conf["bucket"], options.wpath))
     os.system("gsutil iam get gs://{} > {}/iam.json".format(conf["bucket"], options.wpath))
@@ -95,34 +95,30 @@ def doNew(conf):
         "source" : "smx gcloud cis"}
         )
 
-def doCheck(conf):
-    confdir=CONFDIR.format(options.sysbuck, conf["project"], conf["bucket"])
-    print "checking {}".format(confdir)
-
 def doDelete(confdir):
     match = re.match(""".*gs:\/\/.*\/.*\/(.*)\/storage\/(.*)/.*""", confdir)
     if not match: return
     project=match.group(1)
     bucket=match.group(2)
-    notifile = os.path.join(options.wpath,'notifile')
-    os.system("gsutil notification list gs://{} > {}".format(bucket, notifile))
-    if os.path.isfile(notifile):
-      notes=[]
-      cnote=None
-      with open(notifile) as fp:
-        nstart=True
-        for line in fp:
-           line = line.rstrip('\n')
-           if nstart:
-              nstart=False
-              cnote=line
-              continue
-           nstart=True
-           if line.endswith(options.topic):
-              notes.append(cnote)
-       
-      for ln in notes:
-          os.system("gsutil notification delete {}".format(ln))
+    #notifile = os.path.join(options.wpath,'notifile')
+    #os.system("gsutil notification list gs://{} > {}".format(bucket, notifile))
+    #if os.path.isfile(notifile):
+    #  notes=[]
+    #  cnote=None
+    #  with open(notifile) as fp:
+    #    nstart=True
+    #    for line in fp:
+    #       line = line.rstrip('\n')
+    #       if nstart:
+    #          nstart=False
+    #          cnote=line
+    #          continue
+    #       nstart=True
+    #       if line.endswith(options.topic):
+    #          notes.append(cnote)
+    #   
+    #  for ln in notes:
+    #      os.system("gsutil notification delete {}".format(ln))
     os.system("gsutil rm -r {}".format(confdir))
     util.send_aws_sns({
         "message" : "Removed tracking of bucket {} of project {}.".format(bucket, project),
@@ -135,13 +131,12 @@ def doDelete(confdir):
 for conf in configs:
     if conf["new"]:
         doNew(conf)
-    else:
-        doCheck(conf)
 
 #deal with deletes
 for confdir in deletes:
     doDelete(confdir)
 
 
-
+with open(".bucket_config", "w") as config_file:
+    config_file.write(json.dumps(configs))
 

@@ -1,0 +1,22 @@
+HOME=/home/ubuntu/smx-cis-git
+cd $HOME
+root_project=smx-gcloud-cis
+command_topic=smx-command
+command_subscription=smx-command-subscription
+log_subscription=logs
+root_report=smx-cis-reports
+root_bucket=smx-cis-root
+smx_tag="smx-bucket-watch"
+
+dtfile=$(date '+%Y%m%d%H%M%S')
+mkdir -p $HOME/locks
+
+while true; do
+  message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $log_subscription --format="json(message.attributes, message.data.decode(\"base64\"), message.messageId, message.publishTime)")
+  [ "$message" != "[]" ] || break
+  mkdir -p $HOME/alertmessages
+  echo $message > $HOME/alertmessages/$dtfile.json
+  /usr/bin/flock -n $HOME/locks/gsProcessAlertMessage.lockfile $HOME/gsProcessAlertMessage
+
+done
+

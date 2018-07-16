@@ -42,7 +42,9 @@ rm -rf $WDIR/*
 gsutil ls -L gs://smx-cis-root/config/*/storage.config > $WDIR/allconfig
 gsutil ls gs://$root_system/*/storage > $WDIR/allsysdir
 
-python scheduled_check.py -p $root_project -w $WDIR -s "$root_system" -c "$root_config" -t "$log_topic_url"
+#python scheduled_check.py -p $root_project -w $WDIR -s "$root_system" -c "$root_config" -t "$log_topic_url"
+
+python scheduled_check.py -p $root_project -w $WDIR -s "$root_system" -c "$root_config"
 
 if [ "$DEL" = "Yes" ]
 then
