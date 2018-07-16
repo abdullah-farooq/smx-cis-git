@@ -65,7 +65,17 @@ def doNew(proj, back):
     os.system("gsutil ls -b -L gs://{} > {}/acl.txt".format(buck, options.wpath))
     os.system("gsutil iam get gs://{} > {}/iam.json".format(buck, options.wpath))
     os.system("gsutil cp {}/acl.txt {}".format(options.wpath, confdir))
-    os.system("gsutil cp {}/iam.json {}".format(options.wpath, confdir))
+    
+    # remove etag from iam file
+    iamfile=os.path.join(options.wpath, 'iam.json')
+    js=readjson(iamfile) 
+    if "etag" in js:
+        js.pop("etag", None)
+
+    with open(iamfile, "w") as jfile:
+        jfile.write(json.dumps(js))
+
+    os.system("gsutil cp {} {}".format(iamfile, confdir))
 
     util.send_aws_sns({
         "message" : "Set up to tracking for bucket {} of project {}.".format(buck, proj),
@@ -73,6 +83,9 @@ def doNew(proj, back):
         "source" : "smx gcloud cis"}
         )
 
+def json_compare(j1, j2):
+    a, b = json.dumps(j1, sort_keys=True), json.dumps(j2, sort_keys=True)
+    return a==b
 
 # loop through the messages we got
 for message in mess:
@@ -84,7 +97,10 @@ for message in mess:
   # we only eal with notice, not security complaints
   if not severity == "NOTICE": continue
   
-  method=data["protoPayload"]["methodName"]
+  ##print json.dumps(data)
+  ##sys.exit()
+  payload=data["protoPayload"]
+  method=payload["methodName"]
   proj=data["resource"]["labels"]["project_id"]
   buck=data["resource"]["labels"]["bucket_name"]
   
@@ -92,11 +108,13 @@ for message in mess:
   find = jmespath.search("[?project == '{}' && bucket=='{}']".format(proj, buck), config)
   findb = len(find) > 0
 
+  labfile = "{}/{}.lab".format(options.wpath, buck)
+  os.system("gsutil label get gs://{} > {}".format(buck, labfile))
+  labels = readjson(labfile)
+
+  confdir=CONFDIR.format(options.sysbuck, proj, buck)
+
   if method=="storage.buckets.update":
-      labfile = "{}/{}.lab".format(options.wpath, buck)      
-      os.system("gsutil label get gs://{} > {}".format(buck, labfile))
-      labels = readjson(labfile)
-      
       if options.tag in labels and not findb:
           # it's new we need to add configuration for this bucket
           doNew(proj, buck)
@@ -113,17 +131,49 @@ for message in mess:
       # we need to check what update on the object
       # if it is public report alert
       # else if it is acl report notify
-      print "check...."
+      if not "resourceName"  in payload: continue
+      objname = payload["resourceName"]
+      if not "serviceData" in payload: continue
+      service=payload["serviceData"]
+      if not "policyDelta" in service: continue
+      pd=service["policyDelta"]
+      if len(pd)==0: continue
+      
+      mes="ACL on {} has been modified. Policy delta: {}".format(objname, json.dumps(pd))
+      # report the alert to sns
+      util.send_aws_sns({
+        "message" : mes,
+        "type":"alert",
+        "source" : "smx gcloud cis"}
+        )
       continue
-
-  if method=="storage.buckets.update":
-      # we need to check acl?
-       print "checking..."
-       continue
 
   if method=="storage.setIamPermissions":
       # we need to check iam
-      print "checking..."
+      cfile="{}/{}.iam".format(options.wpath,buck)
+      ofile="{}/{}.json".format(options.wpath,buck)
+      os.system("gsutil iam get gs://{} > {}".format(buck, cfile))
+      os.system("gsutil cp {}iam.json {}".format(confdir, ofile))
+      j1=readjson(cfile)
+      if "etag" in j1:
+          j1.pop("etag", None)
+
+      j2=readjson(ofile)
+
+      if not json_compare(j1,j2):
+          mes="IAM changes detected for {} of {}: changing from {} to {}."
+
+          # force back if set to be remediate
+          if labels[options.tag] == "remediate":
+              os.system("gsutil -m iam set {} gs://{}".format(ofile, buck))
+              mes="IAM changes detected for {} of {}: changing from {} to {}. The change has been rolled back."
+          
+          # report the alert to sns
+          util.send_aws_sns({
+            "message" : mes.format(buck, proj, j1, j2),
+            "type":"alert", 
+            "source" : "smx gcloud cis"}
+            )
       continue
 
   if method == "storage.buckets.delete":
