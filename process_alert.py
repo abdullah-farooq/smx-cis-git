@@ -38,7 +38,10 @@ for line in open(os.path.join(options.wpath, 'allsysdir')):
 
 def readjson(f):
     with open(f) as json_data:
-        ret=json.load(json_data)
+        try:
+           ret=json.load(json_data)
+        except:
+           ret=[]
         json_data.close()
         return ret
 
