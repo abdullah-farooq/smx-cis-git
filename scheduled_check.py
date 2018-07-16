@@ -85,6 +85,10 @@ def doNew(conf):
     confdir=CONFDIR.format(options.sysbuck, conf["project"], conf["bucket"])
     os.system("gsutil notification create -f json -t {} gs://{}".format(options.topic, conf["bucket"]))
     os.system("touch {}/.lastupdate && gsutil cp {}/.lastupdate {}".format(options.wpath, options.wpath, confdir))
+    os.system("gsutil ls -b -L gs://{} > {}/acl.txt".format(conf["bucket"], options.wpath))
+    os.system("gsutil iam get gs://{} > {}/iam.json".format(conf["bucket"], options.wpath))
+    os.system("gsutil cp {}/acl.txt {}".format(options.wpath, confdir))
+    os.system("gsutil cp {}/iam.json {}".format(options.wpath, confdir))
     util.send_aws_sns({
         "message" : "Set up to tracking for bucket {} of project {}.".format(conf["bucket"],  conf["project"]),
         "type":"info", 

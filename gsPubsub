@@ -10,13 +10,12 @@ root_bucket=smx-cis-root
 dtfile=$(date '+%Y%m%d%H%M%S')
 mkdir -p $HOME/locks
 
-message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription --format="json(message.attributes, message.messageId, message.publishTime)")
-
-if [ "$message" != "[]" ]
-then
+while true; do
+  message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription --format="json(message.attributes, message.messageId, message.publishTime)")
+  [ "$message" != "[]" ] || break
   mkdir -p $HOME/messages
   echo $message > $HOME/messages/$dtfile.json
-  /usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/gsProcessMessage  
-fi
+  /usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/gsProcessMessage
+done
 
 /usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/schdCheck
