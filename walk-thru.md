@@ -111,9 +111,18 @@ resource.type="gcs_bucket"
 ### Test invoke reports
 
 ```
+#create GS objects scan report
 gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Command=RunScan,ScanType=GCloudStorage,Project=wired-ripsaw-209512
 
+# create cis benchmark scan report
 gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Command=RunScan,ScanType=GCloudCIS,Project=wired-ripsaw-209512
+```
+Equivalentyl, you can use GPC Console -
+```
+Topic: smx-command
+Command: RunScan
+ScanType: GCloudCIS
+Project: wired-ripsaw-209512
 ```
 
 ### Test bucket monitoring
