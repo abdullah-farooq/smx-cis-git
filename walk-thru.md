@@ -63,7 +63,8 @@ cd smx-cis-git/
 ### Set up Cron
 ```
 crontab -e
-*/3 * * * * /home/ubuntu/smx-cis-git/gsPubsub
+*/2 * * * * /home/ubuntu/smx-cis-git/gsPubsub
+*/2 * * * * /home/ubuntu/smx-cis-git/gsAlertPubsub
 ```
 
 ### Set up AWS SNS
@@ -89,3 +90,37 @@ gcloud kms decrypt \
       --plaintext-file ~/.aws/config \
       --ciphertext-file ./aws-config
 ```
+
+### Prepare Projects to be tracked
+create exports in GCP stackdriver logging, with -
+
+```
+# name
+smx-cis-sink
+
+# destination
+# custom
+pubsub.googleapis.com/projects/smx-gcloud-cis/topics/cis-alerts
+
+# filter
+resource.type="gcs_bucket"
+(protoPayload.methodName = "storage.objects.update" OR protoPayload.methodName ="storage.setIamPermissions" OR protoPayload.methodName="storage.buckets.delete" OR protoPayload.methodName="storage.buckets.update")
+```
+
+
+### Test invoke reports
+
+```
+gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Command=RunScan,ScanType=GCloudStorage,Project=wired-ripsaw-209512
+
+gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Command=RunScan,ScanType=GCloudCIS,Project=wired-ripsaw-209512
+```
+
+### Test bucket monitoring
+Create lable:
+```
+# smx-bucket-watch
+# value - reports
+# value - remediate
+```
+
