@@ -17,9 +17,9 @@ parser.add_option("-p", "--project", action="store", type="string", dest="projec
 
 (options, args) = parser.parse_args(sys.argv)
 
+# read in config file !!
 scfg = "gs://{}/.config/.config/storage/".format(options.sysbuck)
 buckre = """gs:\/\/.*/(.*)/storage/(.*)/"""
-
 config = []
 for line in open(os.path.join(options.wpath, 'allsysdir')):
     line = line.rstrip('\n')
@@ -36,7 +36,11 @@ for line in open(os.path.join(options.wpath, 'allsysdir')):
             "sysdir" : line
             })
 
+
 def readjson(f):
+    """
+    inline utility function read json from file.
+    """
     with open(f) as json_data:
         try:
            ret=json.load(json_data)
@@ -45,12 +49,16 @@ def readjson(f):
         json_data.close()
         return ret
 
+# read in the message
 mess=readjson(options.file)
 
-# os.remove(sys.argv[1])
 
+# utility functions
 CONFDIR="gs://{}/{}/storage/{}/"
 def doDelete(proj, buck):
+    """
+    deal with delete a bucket configuration - opt-out
+    """
     confdir=CONFDIR.format(options.sysbuck, proj, buck)
     os.system("gsutil rm -r {}".format(confdir))
     util.send_aws_sns({
@@ -60,6 +68,9 @@ def doDelete(proj, buck):
         })
 
 def doNew(proj, back):
+    """
+    deal with add a bucket configuration - opt-in
+    """
     confdir=CONFDIR.format(options.sysbuck, proj, buck)
     os.system("touch {}/.lastupdate && gsutil cp {}/.lastupdate {}".format(options.wpath, options.wpath, confdir))
     os.system("gsutil ls -b -L gs://{} > {}/acl.txt".format(buck, options.wpath))
@@ -84,10 +95,17 @@ def doNew(proj, back):
         )
 
 def json_compare(j1, j2):
+    """
+    compare json objects
+    """
     a, b = json.dumps(j1, sort_keys=True), json.dumps(j2, sort_keys=True)
     return a==b
 
+#
+# now everything is in place, loop through the message
+# although we are reading only one each time, just in case 
 # loop through the messages we got
+#
 for message in mess:
 
   # get the attributes we are interested out of the message
@@ -96,14 +114,14 @@ for message in mess:
 
   # we only eal with notice, not security complaints
   if not severity == "NOTICE": continue
-  
+   
   ##print json.dumps(data)
   ##sys.exit()
   payload=data["protoPayload"]
   method=payload["methodName"]
   proj=data["resource"]["labels"]["project_id"]
   buck=data["resource"]["labels"]["bucket_name"]
-  
+  print "Project:{}\nBucket:{}\nMethod:{}".format(proj,buck,method)
   # find our configuration of this bucket
   find = jmespath.search("[?project == '{}' && bucket=='{}']".format(proj, buck), config)
   findb = len(find) > 0

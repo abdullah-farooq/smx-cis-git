@@ -10,11 +10,14 @@ smx_tag="smx-bucket-watch"
 
 WDIR=$(uuidgen)
 mkdir $WDIR
-gsutil ls gs://$root_system/*/storage > $WDIR/allsysdir
+# echo "gsutil ls gs://$root_bucket/*/storage > $WDIR/allsysdir"
+gsutil ls gs://$root_bucket/*/storage > $WDIR/allsysdir
 
 for entry in `ls $MessHome/*.json`; do
     mv $entry $entry.txt
+    echo "python ./process_alert.py -f $entry.txt -w $WDIR -s $root_bucket -t $smx_tag -p $root_project"
     python ./process_alert.py -f $entry.txt -w $WDIR -s $root_bucket -t $smx_tag -p $root_project
+    echo finished $entry.txt
     rm $entry.txt
 done
 

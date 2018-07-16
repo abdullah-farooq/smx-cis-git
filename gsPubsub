@@ -11,11 +11,12 @@ dtfile=$(date '+%Y%m%d%H%M%S')
 mkdir -p $HOME/locks
 
 while true; do
+ while true; do
   message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription --format="json(message.attributes, message.messageId, message.publishTime)")
   [ "$message" != "[]" ] || break
   mkdir -p $HOME/messages
   echo $message > $HOME/messages/$dtfile.json
   /usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/gsProcessMessage
+ done
+ sleep $[ ( $RANDOM % 70 )  + 50 ]s
 done
-
-## /usr/bin/flock -n $HOME/locks/gsSchdCheck.lockfile $HOME/gsSchdCheck
