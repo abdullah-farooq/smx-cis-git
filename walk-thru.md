@@ -60,11 +60,10 @@ cd smx-cis-git/
 ./gsPubsub
 ```
 
-### Set up Cron
+### Start server
 ```
-crontab -e
-*/2 * * * * /home/ubuntu/smx-cis-git/gsPubsub
-*/2 * * * * /home/ubuntu/smx-cis-git/gsAlertPubsub
+cd ~/smx-cis-git
+./gsStartServers
 ```
 
 ### Set up AWS SNS
@@ -133,3 +132,8 @@ Create lable:
 # value - remediate
 ```
 
+### Kill server
+```
+cd ~/smx-cis-git
+./gsKillServers
+```
