@@ -108,7 +108,9 @@ pubsub.googleapis.com/projects/smx-gcloud-cis/topics/cis-alerts
 
 # filter
 resource.type="gcs_bucket"
-(protoPayload.methodName = "storage.objects.update" OR protoPayload.methodName ="storage.setIamPermissions" OR protoPayload.methodName="storage.buckets.delete" 
+(protoPayload.methodName = "storage.objects.update" 
+OR protoPayload.methodName ="storage.setIamPermissions" 
+OR protoPayload.methodName="storage.buckets.delete" 
 OR protoPayload.methodName="storage.buckets.update")
 ```
 
