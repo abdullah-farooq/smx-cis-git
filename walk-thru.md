@@ -19,13 +19,18 @@ gcloud pubsub subscriptions create --project $root_project --topic $command_topi
 ### Test pubsub
 
 ```
-gcloud pubsub topics publish --project $root_project $command_topic --attribute Command=RunScan,ScanType=GCloudStorage,Project=wired-ripsaw-209512
+gcloud pubsub topics publish --project $root_project $command_topic --attribute \
+Command=RunScan,ScanType=GCloudStorage,Project=wired-ripsaw-209512
 
-gcloud pubsub topics publish --project $root_project $command_topic --attribute Command=RunScan,ScanType=GCloudCIS,Project=wired-ripsaw-209512
+gcloud pubsub topics publish --project $root_project $command_topic --attribute \
+Command=RunScan,ScanType=GCloudCIS,Project=wired-ripsaw-209512
 
-gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription --format="json(message.attributes, message.messageId, message.publishTime)"
+gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription \
+--format="json(message.attributes, message.messageId, message.publishTime)"
 
-#gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription #--format="json(message.attributes, message.data.decode(\"base64\"), message.messageId, #message.publishTime)"
+#gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription 
+#--format="json(message.attributes, message.data.decode(\"base64\"), message.messageId, 
+#message.publishTime)"
 ```
 
 ## Start VM
@@ -103,7 +108,8 @@ pubsub.googleapis.com/projects/smx-gcloud-cis/topics/cis-alerts
 
 # filter
 resource.type="gcs_bucket"
-(protoPayload.methodName = "storage.objects.update" OR protoPayload.methodName ="storage.setIamPermissions" OR protoPayload.methodName="storage.buckets.delete" OR protoPayload.methodName="storage.buckets.update")
+(protoPayload.methodName = "storage.objects.update" OR protoPayload.methodName ="storage.setIamPermissions" OR protoPayload.methodName="storage.buckets.delete" 
+OR protoPayload.methodName="storage.buckets.update")
 ```
 
 
@@ -111,10 +117,12 @@ resource.type="gcs_bucket"
 
 ```
 #create GS objects scan report
-gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Command=RunScan,ScanType=GCloudStorage,Project=wired-ripsaw-209512
+gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute \
+Command=RunScan,ScanType=GCloudStorage,Project=wired-ripsaw-209512
 
 # create cis benchmark scan report
-gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute Command=RunScan,ScanType=GCloudCIS,Project=wired-ripsaw-209512
+gcloud pubsub topics publish --project smx-gcloud-cis smx-command --attribute  \
+Command=RunScan,ScanType=GCloudCIS,Project=wired-ripsaw-209512
 ```
 Equivalently, you can use GPC Console -
 ```
