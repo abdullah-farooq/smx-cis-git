@@ -1,5 +1,11 @@
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
 HOME=/home/ubuntu/smx-cis-git
 cd $HOME
+
+# some of the constants
 root_project=smx-gcloud-cis
 command_topic=smx-command
 command_subscription=smx-command-subscription
@@ -8,17 +14,24 @@ root_report=smx-cis-reports
 root_bucket=smx-cis-root
 smx_tag="smx-bucket-watch"
 
+# init
 dtfile=$(date '+%Y%m%d%H%M%S')
 mkdir -p $HOME/locks
 
+# loop forever
 while true; do
-while true; do
+ # wake up for the handling
+ while true; do
+  # pull the message
   message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $log_subscription --format="json(message.attributes, message.data.decode(\"base64\"), message.messageId, message.publishTime)")
+  # see if there is a messge
   [ "$message" != "[]" ] || break
+  # now we got something
   mkdir -p $HOME/alertmessages
   echo process message...
   echo $message > $HOME/alertmessages/$dtfile.json
+  # start the process
   /usr/bin/flock -n $HOME/locks/gsProcessAlertMessage.lockfile $HOME/gsProcessAlertMessage
-done
-sleep $[ ( $RANDOM % 90 )  + 30 ]s
+ done
+ sleep $[ ( $RANDOM % 90 )  + 30 ]s
 done

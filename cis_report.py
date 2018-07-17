@@ -1,3 +1,7 @@
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
 from datetime import tzinfo, timedelta, datetime
 import json
 import StringIO
@@ -9,18 +13,22 @@ import jmespath
 from optparse import OptionParser
 parser = OptionParser()
 
+# take input report: path, project: which project; summary: whether it's summary
 parser.add_option("-r", "--report", action="store", type="string", dest="report")
 parser.add_option("-p", "--project", action="store", type="string", dest="project")
 parser.add_option("-s", "--summary", action="store_true", dest="summary", default=False)
 
 (options, args) = parser.parse_args(sys.argv)
 
+# project is a subdir under the report dir 
 report_path=os.path.join(options.report, options.project)
 
+# check everything is there
 if not os.path.exists(report_path):
    print "Report path for project {} does not exist. Please check the inputs.\n\n".format(options.project)
    quit()
 
+# init project summary 
 project={}
 project["name"]=options.project
 project["iam"]=0
@@ -34,6 +42,7 @@ project["fwr"]=0
 project["roles"]=0
 project["peers"]=0
 
+# init violation summaries for item
 c2d1={}
 c2d1["violation"]=False
 c1d12={}
@@ -51,11 +60,12 @@ c4d1["offendings"]=[]
 c4d2["violation"]=False
 c4d2["offendings"]=[]
 
-
+# read in iam
 f = open(os.path.join(report_path, 'project-iam'))
 iam = json.loads(f.read())
 f.close()
 
+# check iam policies
 iam["totalAuditConfig"]=0
 iam["hasAllServices"]=False
 if "auditConfigs" in iam:
@@ -64,12 +74,13 @@ if "auditConfigs" in iam:
     if len(allservice) > 0 and len(allservice[0])==3:
       iam["hasAllServices"]=True 
 
+# check iam violations
 if iam["totalAuditConfig"]==0:
   c2d1["violation"]=True
   project["violations"] += 1
 elif not iam["hasAllServices"]:
   c2d1["violation"]=True
-  c2d1["message"]="No audit settings found for this project. Please set it explicitely"
+  c2d1["message"]="No audit settings found for this project. Please set it explicitly"
 
 if "bindings" in iam:
   project["roles"] = len(iam["bindings"])
@@ -79,7 +90,8 @@ if "bindings" in iam:
   sas=jmespath.search("[?starts_with(@, `serviceAccount:`)]", members)
   project["sas"] = len(sas)
   owner= jmespath.search("bindings[?role==`roles/owner` && members[?starts_with(@,`serviceAccount:`)]]", iam)
-  
+
+# check owner role violations  
   if len(owner)>0:
       c1d12["violation"]=True
       c1d12["offendings"]=[]
@@ -89,6 +101,7 @@ if "bindings" in iam:
              project["violations"] += 1
              c1d12["offendings"].append(onr)
 
+# check kms violations 
 kmsfile=os.path.join(report_path,'project-kms')
 if os.path.isfile(kmsfile):
   with open(kmsfile) as fp:
@@ -113,6 +126,7 @@ if os.path.isfile(kmsfile):
                     c2d8["offendings"].append(kms)
           kstart=True
 
+# read in network information
 nwpath=os.path.join(report_path,'project-network')
 f=open(nwpath)
 network = json.loads(f.read())
@@ -122,28 +136,36 @@ f=open(subspath)
 subnets = json.loads(f.read())
 f.close()
 
+# init network summaries
 dt = datetime.now()
 dtstr = dt.isoformat(' ')
-
 project["vpcs"] = len(network)
 project["subnets"] = len(subnets)
 
 noflowflag= jmespath.search("[?!enableFlowLogs]", subnets)
 
+# check vpc violation
 c4d3["violation"] = len(noflowflag) > 0
 project["violations"] += len(noflowflag)
 for sbn in noflowflag:
    c4d3["offendings"].append({"name":sbn["name"], "vpc":sbn["network"], "region": sbn["region"]})
 
+# read firewall information
 fwrpath=os.path.join(report_path,'project-firewall-rules')
 f=open(fwrpath)
 firewallrs = json.loads(f.read())
 f.close()
 
 def arr_in_range (arr, num):
+   """
+   this is a utility for testing port range array contains port number
+   """
    return any([in_range(s, num) for s in arr])
 
 def in_range(rg, num):
+   """
+   this is a utility for testing port range contains port number
+   """
    if rg.isdigit():
       return int(rg) == num
    sar = rg.split('-')
@@ -155,6 +177,7 @@ def in_range(rg, num):
       return False
    return True
 
+# check firewall violations
 project["fwr"] = len(firewallrs)
 for rule in firewallrs:
     if any([s.startswith('0.0.0.0') for s in rule["sourceRanges"]]):
@@ -176,6 +199,7 @@ for rule in firewallrs:
                 c4d2["offendings"].append(rule)
                 project["violations"] += 1
 
+# check peer violations
 peers=jmespath.search("[?peerings]", network)
 c4d5={}
 c4d5["warning"]=len(peers) > 0
@@ -188,6 +212,9 @@ for pr in peers:
       c4d5["offendings"].append({"vpc": pr["name"], "state": p["state"], "network":p["network"]})
 
 def do_offending():
+  """
+  print out html of each benchmark
+  """
   print """<tr><td colspan="20"><table><thead><tr><th colspan="2">SMX Benchmark</th><th>Level</th><th>VPC</th><th>Findings</th></tr></thead>"""
   if c1d12["violation"]:
       for v in c1d12["offendings"]:
@@ -222,6 +249,9 @@ def do_offending():
 
 
 def do_summary():
+  """
+  print out html summary
+  """
  html="""
       <thead>
          <tr>
@@ -246,6 +276,7 @@ def do_summary():
         project["subnets"], project["fwr"], project["violations"], project["warnings"], dtstr)
  print html
 
+# this is the main - print out everything
 print "<table>"
 do_summary()
 do_offending()

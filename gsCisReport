@@ -1,13 +1,27 @@
-#python report.py $@
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
+
+# init
 dt=$(date '+%Y%m%d%H%M%S')
 html=$1/cisscan-report-$dt.html
 pdf=$1/cisscan-report-$dt.pdf
-cp report.html $html
+
+# make a copy of the template
+cp cis_report.html $html
+
+# call the python script to generate report
 python cis_report.py -r $1 -p $2 >> $html
+
+# make a pdf via the html
 xvfb-run wkhtmltopdf $html $pdf
+
+# copy the reports to the report directory
 gsutil cp $html gs://$3/$2/
 gsutil cp $pdf gs://$3/$2/
 
+# send out sns
 python awssns.py -m "CIS scan report finished" -t "info"
 
 
