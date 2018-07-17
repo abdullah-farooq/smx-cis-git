@@ -5,10 +5,10 @@
 export root_project=smx-gcloud-cis
 export command_topic=smx-command
 export command_subscription=smx-command-subscription
-export log_topic=log-aggregation
+export log_topic=cis-alerts
+export log_subscription=logs
 export root_report=smx-cis-reports
 export root_bucket=smx-cis-root/system
-export root_bucket=smx-cis-root/config
 ```
 ## Pubsub
 
