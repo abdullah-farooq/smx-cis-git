@@ -1,0 +1,24 @@
+#!/bin/bash
+# Smartronix Gcloud CIS auto-start at boot
+
+
+SMXCIS_HOME=/home/ubuntu/smx-cis-git
+USER=ubuntu
+
+case $1 in
+start)
+/bin/su $USER $SMXCIS_HOME/gsStartServers
+;;
+stop)
+/bin/su $USER $SMXCIS_HOME/gsKillServers
+;;
+restart)
+/bin/su $USER $SMXCIS_HOME/gsKillServers
+/bin/su $USER $SMXCIS_HOME/gsStartServers
+;;
+force-reload)
+/bin/su $USER $SMXCIS_HOME/gsKillServers
+/bin/su $USER $SMXCIS_HOME/gsStartServers
+;;
+esac
+exit 0
