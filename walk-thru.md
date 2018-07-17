@@ -139,7 +139,7 @@ cd ~/smx-cis-git
 ```
 
 ### Set up as service
-The code is there but have not tested it.
+The code is there but have not tested it...
 ```
 sudo cp smxcis /etc/init.d/
 chmod +x /etc/init.d/smxcis
@@ -147,4 +147,9 @@ sudo ln -s /etc/init.d/smxcis /etc/rc1.d/K99smxcis
 sudo ln -s /etc/init.d/smxcis /etc/rc2.d/S99smxcis
 ```
 
-
+### To do list
+* comment code
+* swap out shell to python
+* modularize code
+* add log back to aws cloud trail
+* add other functions
