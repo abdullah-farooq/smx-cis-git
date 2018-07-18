@@ -1,3 +1,4 @@
+# this is just a place to write down all the constants
 export root_project=smx-gcloud-cis
 export command_topic=smx-command
 export command_subscription=smx-command-subscription

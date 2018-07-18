@@ -1,13 +1,20 @@
-#python report.py $@
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
 dt=$(date '+%Y%m%d%H%M%S')
 html=$1/gsscan-report-$dt.html
 pdf=$1/gsscan-report-$dt.pdf
+# generate the reports
 cp report.html $html
 python report.py -s -r $1 -p $2 >> $html
 python report.py -r $1 -p $2 >> $html
 echo '</div></body></html>' >> $html
+# pdf report
 xvfb-run wkhtmltopdf $html $pdf
+# copy reports to GS report directory
 gsutil cp $html gs://$3/$2/
 gsutil cp $pdf gs://$3/$2/
+# send out SNS
 python awssns.py -m "GS scan report finished" -t "info"
 

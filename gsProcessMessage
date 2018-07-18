@@ -1,8 +1,14 @@
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
 HOME=/home/ubuntu/smx-cis-git
 MessHome=$HOME/messages
-
+# deal with the message
 for entry in `ls $MessHome/*.json`; do
+    #mark it
     mv $entry $entry.txt
+	# call process_message to handle it
     python ./process_message.py $entry.txt
 done
 

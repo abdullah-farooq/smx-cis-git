@@ -1,3 +1,10 @@
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
+
+
+#constants
 HOME=/home/ubuntu/smx-cis-git
 MessHome=$HOME/alertmessages
 root_project=smx-gcloud-cis
@@ -8,17 +15,22 @@ root_report=smx-cis-reports
 root_bucket=smx-cis-root/system
 smx_tag="smx-bucket-watch"
 
+#init
 WDIR=$(uuidgen)
 mkdir $WDIR
 # echo "gsutil ls gs://$root_bucket/*/storage > $WDIR/allsysdir"
 gsutil ls gs://$root_bucket/*/storage > $WDIR/allsysdir
 
+#loop through all messages
 for entry in `ls $MessHome/*.json`; do
+    # mark the message
     mv $entry $entry.txt
+	# handle the message by calling process_alert
     echo "python ./process_alert.py -f $entry.txt -w $WDIR -s $root_bucket -t $smx_tag -p $root_project"
     python ./process_alert.py -f $entry.txt -w $WDIR -s $root_bucket -t $smx_tag -p $root_project
     echo finished $entry.txt
+	# remove the message
     rm $entry.txt
 done
-
+#clean up
 rm -rf $WDIR

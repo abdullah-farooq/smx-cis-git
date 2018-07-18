@@ -1,3 +1,8 @@
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
+#constants
 HOME=/home/ubuntu/smx-cis-git
 cd $HOME
 root_project=smx-gcloud-cis
@@ -6,15 +11,20 @@ command_subscription=smx-command-subscription
 log_topic=log-aggregation
 root_report=smx-cis-reports
 root_bucket=smx-cis-root
-
+# init
 dtfile=$(date '+%Y%m%d%H%M%S')
 mkdir -p $HOME/locks
 
+# loop forever
 while true; do
+ # loop for each message pull
  while true; do
+  # pull message
   message=$(gcloud pubsub subscriptions pull --project $root_project --auto-ack $command_subscription --format="json(message.attributes, message.messageId, message.publishTime)")
+  # go to sleep if not message
   [ "$message" != "[]" ] || break
   mkdir -p $HOME/messages
+  # handle the message by gsProcessMessage
   echo $message > $HOME/messages/$dtfile.json
   /usr/bin/flock -n $HOME/locks/gsProcessMessage.lockfile $HOME/gsProcessMessage
  done

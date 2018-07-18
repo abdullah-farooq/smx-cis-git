@@ -1,4 +1,8 @@
-#!/bin/sh
+################################################################################
+#            Copyright 2018 Smartronix Inc. All Rights Reserved.               #
+#                                                                              #
+################################################################################
+
 root_project=smx-gcloud-cis
 command_topic=smx-command
 command_subscription=smx-command-subscription
@@ -6,6 +10,7 @@ log_topic=log-aggregation
 root_report=smx-cis-reports
 root_bucket=smx-cis-root
 
+# usage - take in project to scan and work directory
 usage ()
 {
   echo 'Usage : gsScan -p <project-id> -r <report-to-path>'
@@ -32,13 +37,17 @@ fi
 
 if [ "$RPATH" = "" ]
 then
+    # if no work directory specified, create a new one - unique
     RPATH=$(uuidgen)
+	TODEL="Yes"
 	mkdir $RPATH
 fi
 
+# init
 mkdir -p $RPATH/$PROJECT
 DPATH=$RPATH/$PROJECT
 
+# sub routine to collect all information on CIS benchmarks
 scan_cis() {
   gcloud projects get-iam-policy $PROJECT --format json > $DPATH/project-iam  
   gcloud kms locations list |  while read loc
@@ -55,6 +64,7 @@ scan_cis() {
 
 }
 
+# sub routine to collect KMS information
 list_kms () {
    gcloud kms keyrings list --location $1 --project $PROJECT 2>/dev/null | while read kr
    do
@@ -66,9 +76,14 @@ list_kms () {
    done
 }
 
+# do the scan
 scan_cis
-
+#gnerate report with information collected
 ./gsCisReport $RPATH $PROJECT $root_report
-rm -rf $RPATH
+# remove the work directory
+if [ "$TODEL" = "Yes" ] 	
+then
+ rm -rf $RPATH
+fi
 
 
