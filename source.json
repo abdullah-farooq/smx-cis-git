@@ -1,0 +1,40 @@
+{
+  "source":{
+    "id":350623523,
+    "name":"Custom App",
+    "category":"gcp/smxcis",
+    "automaticDateParsing":true,
+    "multilineProcessingEnabled":false,
+    "useAutolineMatching":false,
+    "contentType":"GoogleCloudLogs",
+    "forceTimeZone":false,
+    "timeZone":"Etc/UTC",
+    "filters":[],
+    "cutoffTimestamp":0,
+    "encoding":"UTF-8",
+    "thirdPartyRef":{
+    "resources":[
+       {
+         "serviceType": "GoogleCloudLogs",
+         "path":{
+           "type":"NoPathExpression"
+         },
+         "authentication": {
+           "type": "GoogleCloudAuthentication",
+           "validations": [
+             {
+               "type":"GoogleCloudValidationDoc",
+               "name":"google97c3a076247ffd6f.html",
+               "content": "google-site-verification: google97c3a076247ffd6f.html"
+             }
+           ]
+         }
+       }
+     ]
+   },
+    "messagePerRequest":false,
+    "url":"https://endpoint3.collection.us2.sumologic.com/receiver/v1/http/ZaVnC4dhaV1RULBwoYt3JAPn_po3WYGYaivVAwLZe_xgbQ0mJc0nOAhUJhCcr2z8-bijU6dxdcCCM3HRWTLbNhzIriVo-V8OgiNDH4Q84cn8clbeGKs3tw==",
+    "sourceType":"HTTP",
+    "alive":true
+  }
+}

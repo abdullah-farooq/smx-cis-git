@@ -1,0 +1,4 @@
+nohup /bin/bash ./gsAlertPubsub &
+nohup /bin/bash ./gsPubsub &
+
+
