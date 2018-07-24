@@ -1,12 +1,12 @@
 #!/bin/sh
-root_project=smx-gcloud-cis
+root_project=smx-gcloud-cis-abdullah
 command_topic=smx-command
 command_subscription=smx-command-subscription
 log_topic=log-aggregation
 log_topic_url=projects/$root_project/topics/$log_topic
-root_report=smx-cis-reports
-root_system=smx-cis-root/system
-root_config=smx-cis-root/config
+root_report=smx-cis-reports-abdullah
+root_system=smx-cis-root-abdullah/system
+root_config=smx-cis-root-abdullah/config
 
 usage ()
 {
