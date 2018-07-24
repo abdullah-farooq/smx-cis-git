@@ -5,12 +5,12 @@
 #constants
 HOME=/home/ubuntu/smx-cis-git
 cd $HOME
-root_project=smx-gcloud-cis
+root_project=smx-gcloud-cis-abdullah
 command_topic=smx-command
 command_subscription=smx-command-subscription
 log_topic=log-aggregation
-root_report=smx-cis-reports
-root_bucket=smx-cis-root
+root_report=smx-cis-reports-abdullah
+root_bucket=smx-cis-root-abdullah
 # init
 dtfile=$(date '+%Y%m%d%H%M%S')
 mkdir -p $HOME/locks
