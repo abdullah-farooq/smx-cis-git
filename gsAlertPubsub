@@ -6,12 +6,12 @@ HOME=/home/ubuntu/smx-cis-git
 cd $HOME
 
 # some of the constants
-root_project=smx-gcloud-cis
+root_project=smx-gcloud-cis-abdullah
 command_topic=smx-command
 command_subscription=smx-command-subscription
 log_subscription=logs
-root_report=smx-cis-reports
-root_bucket=smx-cis-root
+root_report=smx-cis-reports-abdullah
+root_bucket=smx-cis-root-abdullah
 smx_tag="smx-bucket-watch"
 
 # init
