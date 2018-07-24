@@ -1,5 +1,5 @@
 resources:
-- name: smx-cis-vm-147603613607
+- name: ubuntu
   type: compute.v1.instance
   properties:
     zone: us-east4-c
@@ -21,6 +21,6 @@ resources:
           cd /home/ubuntu
       kind: compute#metadata
     serviceAccounts:
-    - email: 147603613607-compute@developer.gserviceaccount.com
+    - email: 323252478117-compute@developer.gserviceaccount.com
       scopes:
       - https://www.googleapis.com/auth/cloud-platform
