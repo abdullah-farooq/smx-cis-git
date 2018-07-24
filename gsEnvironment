@@ -1,8 +1,8 @@
 # this is just a place to write down all the constants
-export root_project=smx-gcloud-cis
+export root_project=smx-gcloud-cis-abdullah
 export command_topic=smx-command
 export command_subscription=smx-command-subscription
 export log_topic=log-aggregation
-export root_report=smx-cis-reports
-export root_system=smx-cis-root/system
-export root_config=smx-cis-root/config
+export root_report=smx-cis-reports-abdullah
+export root_system=smx-cis-root-abdullah/system
+export root_config=smx-cis-root-abdullah/config
