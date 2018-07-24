@@ -3,15 +3,15 @@ resources:
   type: compute.v1.instance
   properties:
     zone: us-east4-c
-    machineType: zones/us-east4-c/machineTypes/f1-micro
+    machineType: zones/us-east4-c/machineTypes/n1-standard-1
     disks:
     - deviceName: boot
       type: PERSISTENT
       boot: true
       autoDelete: true
       initializeParams:
-        diskSizeGb: '30'
-        sourceImage: projects/ubuntu-os-cloud/global/images/ubuntu-1710-artful-v20180612
+        diskSizeGb: '10'
+        sourceImage: projects/ubuntu-os-cloud/global/images/ubuntu-1604-xenial-v20180627
     networkInterfaces:
     - network: global/networks/default
     metadata:
