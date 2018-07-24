@@ -4,7 +4,7 @@
 ################################################################################
 from datetime import tzinfo, timedelta, datetime
 import json
-import StringIO
+from io import StringIO
 import re
 import sys
 import os
@@ -20,15 +20,15 @@ parser.add_option("-s", "--summary", action="store_true", dest="summary", defaul
 
 (options, args) = parser.parse_args(sys.argv)
 
-# project is a subdir under the report dir 
+# project is a subdir under the report dir
 report_path=os.path.join(options.report, options.project)
 
 # check everything is there
 if not os.path.exists(report_path):
-   print "Report path for project {} does not exist. Please check the inputs.\n\n".format(options.project)
+   print ("\nReport path for project {} does not exist. Please check the inputs.\n".format(options.project))
    quit()
 
-# init project summary 
+# init project summary
 project={}
 project["name"]=options.project
 project["iam"]=0
@@ -72,7 +72,7 @@ if "auditConfigs" in iam:
     iam["totalAuditConfig"]=len(iam["auditConfigs"])
     allservice = jmespath.search("auditConfigs[?service == 'allServices']", iam)
     if len(allservice) > 0 and len(allservice[0])==3:
-      iam["hasAllServices"]=True 
+      iam["hasAllServices"]=True
 
 # check iam violations
 if iam["totalAuditConfig"]==0:
@@ -91,7 +91,7 @@ if "bindings" in iam:
   project["sas"] = len(sas)
   owner= jmespath.search("bindings[?role==`roles/owner` && members[?starts_with(@,`serviceAccount:`)]]", iam)
 
-# check owner role violations  
+# check owner role violations
   if len(owner)>0:
       c1d12["violation"]=True
       c1d12["offendings"]=[]
@@ -101,7 +101,7 @@ if "bindings" in iam:
              project["violations"] += 1
              c1d12["offendings"].append(onr)
 
-# check kms violations 
+# check kms violations
 kmsfile=os.path.join(report_path,'project-kms')
 if os.path.isfile(kmsfile):
   with open(kmsfile) as fp:
@@ -215,44 +215,44 @@ def do_offending():
   """
   print out html of each benchmark
   """
-  print """<tr><td colspan="20"><table><thead><tr><th colspan="2">SMX Benchmark</th><th>Level</th><th>VPC</th><th>Findings</th></tr></thead>"""
+  print ("""<tr><td colspan="20"><table><thead><tr><th colspan="2">SMX Benchmark</th><th>Level</th><th>VPC</th><th>Findings</th></tr></thead>""")
   if c1d12["violation"]:
       for v in c1d12["offendings"]:
-          print """<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td nowrap>{}</td><td>{}</td></tr>""".format("SMX-1.12", "Alert", "ALL", "Service account {} has an owner role".format(v))
+          print ("""<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td nowrap>{}</td><td>{}</td></tr>""".format("SMX-1.12", "Alert", "ALL", "Service account {} has an owner role".format(v)))
 
 
   if c2d1["violation"]:
-      print """<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td nowrap>{}</td><td>{}</td></tr>""".format("SMX-2.1",
-        "Alert","ALL", "No log audit settings found for this project. Please set it explicitely globally using 'allServices'")
-  
+      print ("""<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td nowrap>{}</td><td>{}</td></tr>""".format("SMX-2.1",
+        "Alert","ALL", "No log audit settings found for this project. Please set it explicitely globally using 'allServices'"))
+
   if c2d8["violation"]:
      for k in c2d8["offendings"]:
        vio = "Cryptographic key {} does not have a rotation schedule or schedule period is longer that 90 days.".format(k)
-       print """<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>{}</td></tr>""".format("SMX-2.8", "Alert", "ALL", vio)
+       print ("""<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>{}</td></tr>""".format("SMX-2.8", "Alert", "ALL", vio))
 
   if c4d1["violation"]:
      for k in c4d1["offendings"]:
-         print """<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Wide open SSH:<br/>{}</td></tr>""".format("SMX-4.1", "Alert", os.path.basename(k["network"]), json.dumps(k))
+         print ("""<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Wide open SSH:<br/>{}</td></tr>""".format("SMX-4.1", "Alert", os.path.basename(k["network"]), json.dumps(k)))
 
   if c4d2["violation"]:
       for k in c4d2["offendings"]:
-          print """<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Wide open RDP:<br/>{}</td></tr>""".format("SMX-4.2", "Alert", os.path.basename(k["network"]), json.dumps(k))
+          print ("""<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Wide open RDP:<br/>{}</td></tr>""".format("SMX-4.2", "Alert", os.path.basename(k["network"]), json.dumps(k)))
 
   if c4d3["violation"]:
       for k in c4d3["offendings"]:
-          print """<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Subnet flow log need to be turn on for subnet '{}' in region '{}'.</td></tr>""".format("SMX-4.3", "Alert", os.path.basename(k["vpc"]), k["name"], os.path.basename(k["region"]))
+          print ("""<tr><th style='background-color:#ef3d47'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Subnet flow log need to be turn on for subnet '{}' in region '{}'.</td></tr>""".format("SMX-4.3", "Alert", os.path.basename(k["vpc"]), k["name"], os.path.basename(k["region"])))
 
 
   if c4d5["warning"]:
       for k in c4d5["offendings"]:
-          print """<tr><th style='background-color:orange'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Network Contains {} peered VPCs. Peer network security need to be checked to ensure security.<br/></td></tr>""".format("SMX-4.5", "Warning", k["vpc"], json.dumps(k))
+          print ("""<tr><th style='background-color:orange'>&nbsp;</th><td><b>{}</b></td><td nowrap>{}</td><td>{}</td><td>Network Contains {} peered VPCs. Peer network security need to be checked to ensure security.<br/></td></tr>""".format("SMX-4.5", "Warning", k["vpc"], json.dumps(k)))
 
 
 def do_summary():
   """
   print out html summary
   """
- html="""
+  html="""
       <thead>
          <tr>
             <th colspan='2' rowspan='3'>Scan Summary For Project: {}</th>
@@ -264,20 +264,18 @@ def do_summary():
             <th colspan='1'>VPCs: {}</th>
             <th colspan='1'>Subnets: {}</th>
             <th colspan='1'>Firewall Rules: {}</th>
-         </tr>		 
+         </tr>
     	 <tr>
             <th colspan='1'>Violations: {}</th>
             <th colspan='1'>Warnings: {}</th>
             <th colspan='1'>Report Date: {}</th>
          </tr>
       </thead>
-""".format(project["name"], project["iam"],project["sas"],
-        project["kms"], project["peers"], project["vpcs"], 
-        project["subnets"], project["fwr"], project["violations"], project["warnings"], dtstr)
- print html
+  """.format(project["name"], project["iam"],project["sas"],project["kms"], project["peers"], project["vpcs"],project["subnets"], project["fwr"], project["violations"], project["warnings"], dtstr)
+  print(html)
 
 # this is the main - print out everything
-print "<table>"
+print ("<table>")
 do_summary()
 do_offending()
-print "</table></div></body></html>"
+print ("</table></div></body></html>")
